@@ -21,40 +21,46 @@ public class PeerServiceImpl implements PeerService {
 
 
     @Override
-    public void downPeer(Peer peer, String upstreamName, boolean down) {
+    public void downPeer(Peer peer, String upstreamName) {
 
+        logger.info(
+                "Call DOWN Peer[id:{}, name:{}], upstreamName:{}",
+                peer.getId(), peer.getName(), upstreamName
+        );
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("down", true);
+
+        requestEndpoints(parameters, upstreamName, peer.getId());
     }
 
     @Override
     public void drainPeer(Peer peer, String upstreamName) {
 
-        logger.info("Call drain Peer");
+        logger.info(
+                "Call DRAIN Peer[id:{}, name:{}], upstreamName:{}",
+                peer.getId(), peer.getName(), upstreamName
+        );
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("drain", true);
 
-        RestTemplate restTemplate = new RestTemplate();
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("drain", true);
-
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(map, headers);
-
-        for (String url : getUrls()) {
-            String endPoint = url + upstreamName + "/servers/" + peer.getId();
-            ResponseEntity<String> response = restTemplate.exchange(
-                    endPoint, HttpMethod.PATCH, entity, String.class
-            );
-
-            logger.info(response.getBody());
-        }
+        requestEndpoints(parameters, upstreamName, peer.getId());
 
     }
 
     @Override
     public void upPeer(Peer peer, String upstreamName) {
 
+        logger.info(
+                "Call UP Peer[id:{}, name:{}], upstreamName:{}",
+                peer.getId(), peer.getName(), upstreamName
+        );
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("down", false);
+
+        requestEndpoints(parameters, upstreamName, peer.getId());
     }
 
     private List<String> getUrls() {
@@ -63,5 +69,33 @@ public class PeerServiceImpl implements PeerService {
             urls.add("http://" + serverName + "/api/6/http/upstreams/");
         }
         return urls;
+    }
+
+    private HttpHeaders getHeaders() {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+
+        return headers;
+    }
+
+    private void requestEndpoints(
+            Map<String, Object> parameters,
+            String upstreamName,
+            long peerId) {
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(parameters, getHeaders());
+
+        for (String url : getUrls()) {
+            String endPoint = url + upstreamName + "/servers/" + peerId;
+            ResponseEntity<String> response = restTemplate.exchange(
+                    endPoint, HttpMethod.PATCH, entity, String.class
+            );
+
+            logger.info(response.getBody());
+        }
     }
 }

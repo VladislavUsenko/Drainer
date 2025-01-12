@@ -4,7 +4,7 @@ import com.vladislavuss.nginxadmin.dto.Peer;
 
 public interface PeerService {
 
-    void downPeer(Peer peer, String upstreamName, boolean down);
+    void downPeer(Peer peer, String upstreamName);
 
     void drainPeer(Peer peer, String upstreamName);
 
