@@ -1,4 +1,4 @@
-package com.vladislavuss.nginxadmin.service;
+package com.vladislavuss.nginxadmin.service.peer;
 
 import com.vladislavuss.nginxadmin.dto.Peer;
 
