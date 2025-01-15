@@ -3,12 +3,10 @@ package com.vladislavuss.nginxadmin.controller;
 
 import com.vladislavuss.nginxadmin.dto.Peer;
 import com.vladislavuss.nginxadmin.service.peer.PeerService;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-@RestController("/peer")
+@RestController
+@RequestMapping("/peer")
 public class PeerController {
 
     private final PeerService peerService;
