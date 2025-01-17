@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 
 @RestController
 @RequestMapping("/upstream")
@@ -21,5 +22,10 @@ public class UpstreamController {
     @GetMapping("/{name}")
     public Upstream GetUpstream(@PathVariable String name) {
          return upstreamService.getUpstream(name);
+    }
+
+    @GetMapping("/")
+    public List<Upstream> GetUpstreams() {
+        return upstreamService.getAllUpstreams();
     }
 }
