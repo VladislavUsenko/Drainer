@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -66,7 +67,7 @@ public class PeerServiceImpl implements PeerService {
     private List<String> getUrls() {
         List<String> urls = new ArrayList<>();
         for (String serverName : serverNames) {
-            urls.add("http://" + serverName + "/api/6/http/upstreams/");
+            urls.add("https://" + serverName + "/api/9/http/upstreams/");
         }
         return urls;
     }
@@ -85,7 +86,9 @@ public class PeerServiceImpl implements PeerService {
             String upstreamName,
             long peerId) {
 
-        RestTemplate restTemplate = new RestTemplate();
+        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
+        requestFactory.setReadTimeout(500);
+        RestTemplate restTemplate = new RestTemplate(requestFactory);
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(parameters, getHeaders());
 

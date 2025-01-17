@@ -7,6 +7,9 @@ import com.vladislavuss.nginxadmin.dto.Upstream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -48,28 +51,25 @@ public class UpstreamServiceImpl implements UpstreamService {
 
         List<Upstream> result = null;
 
+        HttpEntity<String> httpEntity = new HttpEntity<>(null);
+
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.getForEntity(getUrl(), String.class);
+        ResponseEntity<Map<String, Upstream>> response =
+        restTemplate.exchange(
+                getUrl(), HttpMethod.GET,
+                httpEntity,
+                new ParameterizedTypeReference<>() {}
+        );
 
         if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-            String body = response.getBody();
-            logger.info(body);
+            logger.info("Upstreams found: {}", response.getBody());
 
-            ObjectMapper mapper = new ObjectMapper();
-
-            Map<String, Upstream> upstreams = null;
-            try {
-                upstreams = mapper.readValue(body, new TypeReference<>() {
-                });
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-
-            result = upstreams.entrySet()
+            result = response.getBody().entrySet()
                     .stream()
                     .map(entry -> new Upstream(entry.getKey(), entry.getValue()))
                     .collect(Collectors.toList());
         }
+
         return result;
     }
 
