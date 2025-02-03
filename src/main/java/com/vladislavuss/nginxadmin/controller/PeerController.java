@@ -22,12 +22,14 @@ public class PeerController {
         peerService.drainPeer(peer, upstreamName);
     }
 
+
     @PatchMapping("/down/{upstreamName}")
     public void down(@RequestBody Peer peer,
                       @PathVariable String upstreamName) {
 
         peerService.downPeer(peer, upstreamName);
     }
+
 
     @PatchMapping("/up/{upstreamName}")
     public void up(@RequestBody Peer peer,
